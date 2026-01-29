@@ -1047,9 +1047,9 @@ function App() {
 
             <div className="flex items-center gap-3">
               {[
-                { icon: Github, href: "https://github.com", label: "GitHub" },
-                { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
-                { icon: Mail, href: "mailto:contact@example.com", label: "Email" },
+                { icon: Github, href: "https://github.com/sangamsingh18" },
+                { icon: Linkedin, href: "https://www.linkedin.com/in/sangam-singh-94a52633b", label: "LinkedIn" },
+                { icon: Mail, href: "singhsangam1800@gmail.com", label: "Email" },
               ].map((social) => (
                 <a
                   key={social.label}
