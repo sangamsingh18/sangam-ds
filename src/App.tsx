@@ -525,7 +525,7 @@ function App() {
                   >
                     <div className="w-full h-full rounded-full overflow-hidden border-4 border-white shadow-2xl">
                       <img
-                      src="/ss.jpeg"
+                      src="/sss.jpg"
                       alt="Sangam Singh"
                       className="w-full h-full object-cover"
                     />
