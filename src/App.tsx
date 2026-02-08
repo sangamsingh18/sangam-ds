@@ -89,7 +89,7 @@ const skillCategories = [
   {
     title: "Libraries & Frameworks",
     icon: Layers,
-    skills: ["Pandas", "NumPy", "Matplotlib", "Seaborn", "Scikit-learn", "TensorFlow", "OpenCV", "React", "Node.js"],
+    skills: ["Pandas", "NumPy", "Matplotlib", "Seaborn","Scikit-learn", "FastAPI","TensorFlow","Beautiful Soup","requests ", "OpenCV", "React", "Node.js","Pydantic"],
   },
   {
     title: "Tools & Core CS",
