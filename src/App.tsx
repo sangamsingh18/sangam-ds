@@ -109,6 +109,14 @@ const projects = [
     github: "https://github.com/sangamsingh18"
   },
   {
+    title: "E-commerce Customer Segmentation System",
+    description:
+      "Customer segmentation using K-Means clustering on e-commerce data.",
+    tech: ["Python", "Pandas"," NumPy", "Scikit-learn", "Matplotlib", "Seaborn"],
+    featured: false,
+    github: "https://github.com/sangamsingh18",
+  }, 
+  {
     title: "blinkit-sales-dashboard",
     description:
       "AI-powered system that identifAn interactive Power BI dashboard showcasing Blinkit sales analysis, including revenue, order trends, and category-wise performance",
