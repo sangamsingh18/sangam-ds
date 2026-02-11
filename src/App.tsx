@@ -481,8 +481,8 @@ function App() {
                   <motion.button
                     onClick={() => {
                       const link = document.createElement('a');
-                      link.href = '/resume.pdf';
-                      link.download = 'Sangam_Singh_Data_Analyst_Resume.pdf';
+                      link.href = '/sangam_ds.pdf';
+                      link.download = 'Sangam_Singh_ds.pdf';
                       document.body.appendChild(link);
                       link.click();
                       document.body.removeChild(link);
