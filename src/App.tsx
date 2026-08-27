@@ -23,6 +23,48 @@ import {
   LineChart,
 } from "lucide-react";
 
+const CONTACT_EMAIL = "singhsangam1800@gmail.com";
+const CONTACT_MAILTO = `mailto:${CONTACT_EMAIL}`;
+const CONTACT_FORM_ENDPOINT =
+  import.meta.env.VITE_CONTACT_FORM_ENDPOINT ?? `https://formsubmit.co/ajax/${CONTACT_EMAIL}`;
+
+type ContactFormData = {
+  name: string;
+  email: string;
+  message: string;
+};
+
+function buildMailtoFallback({ name, email, message }: ContactFormData) {
+  const subject = encodeURIComponent(`Portfolio contact from ${name}`);
+  const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+
+  return `${CONTACT_MAILTO}?subject=${subject}&body=${body}`;
+}
+
+async function sendContactEmail({ name, email, message }: ContactFormData) {
+  const formPayload = new FormData();
+  formPayload.append("name", name);
+  formPayload.append("email", email);
+  formPayload.append("message", message);
+  formPayload.append("_subject", `New portfolio message from ${name}`);
+  formPayload.append("_template", "table");
+  formPayload.append("_captcha", "false");
+  formPayload.append(
+    "_autoresponse",
+    "Thank you for contacting Sangam Singh. I have received your message and will reply soon."
+  );
+
+  const response = await fetch(CONTACT_FORM_ENDPOINT, {
+    method: "POST",
+    body: formPayload,
+    headers: { Accept: "application/json" },
+  });
+
+  if (!response.ok) {
+    throw new Error("Unable to send the contact email right now.");
+  }
+}
+
 // Theme toggle hook
 function useTheme() {
   const [isDark, setIsDark] = useState(() => {
@@ -164,10 +206,11 @@ function App() {
   const { isDark, toggleTheme } = useTheme();
   const [activeSection, setActiveSection] = useState("home");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [formData, setFormData] = useState<ContactFormData>({ name: "", email: "", message: "" });
   const [formErrors, setFormErrors] = useState({ name: "", email: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const { scrollYProgress } = useScroll();
   const headerBg = useTransform(
@@ -246,15 +289,20 @@ function App() {
     if (!validateForm()) return;
 
     setIsSubmitting(true);
+    setSubmitError("");
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    setIsSubmitting(false);
-    setSubmitSuccess(true);
-    setFormData({ name: "", email: "", message: "" });
-
-    setTimeout(() => setSubmitSuccess(false), 3000);
+    try {
+      await sendContactEmail(formData);
+      setSubmitSuccess(true);
+      setFormData({ name: "", email: "", message: "" });
+      setTimeout(() => setSubmitSuccess(false), 5000);
+    } catch {
+      const fallbackUrl = buildMailtoFallback(formData);
+      setSubmitError("Automatic email failed. Your email app is opening so you can send the message manually.");
+      window.location.href = fallbackUrl;
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -309,8 +357,8 @@ function App() {
             <div className="hidden lg:flex items-center gap-2">
               {[
                 { icon: Github, href: "https://github.com/sangamsingh18", label: "GitHub" },
-                { icon: Linkedin, href: "www.linkedin.com/in/sangam-singh-94a52633b", label: "LinkedIn" },
-                { icon: Mail, href: "mailto:singhsangam1800@gmail.com", label: "Email" },
+                { icon: Linkedin, href: "https://www.linkedin.com/in/sangam-singh-94a52633b", label: "LinkedIn" },
+                { icon: Mail, href: CONTACT_MAILTO, label: "Email" },
               ].map((social) => (
                 <motion.a
                   key={social.label}
@@ -377,8 +425,8 @@ function App() {
               <div className="flex gap-2">
                 {[
                   { icon: Github, href: "https://github.com/sangamsingh18", label: "GitHub" },
-                  { icon: Linkedin, href: "www.linkedin.com/in/sangam-singh-94a52633b", label: "LinkedIn" },
-                  { icon: Mail, href: "singhsangam1800@gmail.com", label: "Email" },
+                  { icon: Linkedin, href: "https://www.linkedin.com/in/sangam-singh-94a52633b", label: "LinkedIn" },
+                  { icon: Mail, href: CONTACT_MAILTO, label: "Email" },
                 ].map((social) => (
                   <a
                     key={social.label}
@@ -889,7 +937,7 @@ function App() {
                 className="space-y-4"
               >
                 {[
-                  { icon: Mail, label: "Email", value: "singhsangam1800@gmail.com", href: "singhsangam1800@gmail.com" },
+                  { icon: Mail, label: "Email", value: CONTACT_EMAIL, href: CONTACT_MAILTO },
                   { icon: Linkedin, label: "LinkedIn", value: "linkedin.com/in/sangamsingh", href: "https://linkedin.com/in/sangam-singh-94a52633b" },
                   { icon: Github, label: "GitHub", value: "github.com/sangamsingh", href: "https://github.com/sangamsingh18" },
                   { icon: MapPin, label: "Location", value: "Vadodara, India", href: null },
@@ -946,6 +994,14 @@ function App() {
                   </motion.div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-5">
+                    <p className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-800 dark:border-blue-900/40 dark:bg-blue-950/30 dark:text-blue-200">
+                      This form now sends an admin notification email and an automatic welcome confirmation to your inbox.
+                    </p>
+                    {submitError && (
+                      <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-200">
+                        {submitError}
+                      </p>
+                    )}
                     <div>
                       <label htmlFor="name" className="block text-sm font-bold text-slate-900 dark:text-slate-300 mb-2">
                         Name
@@ -1055,9 +1111,9 @@ function App() {
 
             <div className="flex items-center gap-3">
               {[
-                { icon: Github, href: "https://github.com/sangamsingh18" },
+                { icon: Github, href: "https://github.com/sangamsingh18", label: "GitHub" },
                 { icon: Linkedin, href: "https://www.linkedin.com/in/sangam-singh-94a52633b", label: "LinkedIn" },
-                { icon: Mail, href: "singhsangam1800@gmail.com", label: "Email" },
+                { icon: Mail, href: CONTACT_MAILTO, label: "Email" },
               ].map((social) => (
                 <a
                   key={social.label}
